@@ -15,6 +15,8 @@ namespace HyperMock.Universal
     {
         private readonly List<CallInfo> _callInfoList = new List<CallInfo>();
 
+        internal MethodBase LastMethod { get; private set; }
+
         internal CallInfo FindByParameterMatch(string name, object[] args)
         {
             var callInfoListForName = _callInfoList.Where(ci => ci.Name == name).ToList();
@@ -121,9 +123,48 @@ namespace HyperMock.Universal
             return null;
         }
 
+        internal void RaiseEvent<TMock>(TMock instance, MethodBase eventMethod, EventArgs args)
+        {
+            var eventCallInfo = _callInfoList.FirstOrDefault(ci => ci.Name == eventMethod.Name);
+
+            if (eventCallInfo != null && eventCallInfo.IsEvent)
+            {
+                var del = eventCallInfo.Parameters[0].Value as Delegate;
+
+                if (del == null) return;
+                
+                foreach (var listDel in del.GetInvocationList())
+                {
+                    listDel.DynamicInvoke(instance, args);
+                }
+
+                eventCallInfo.Visited ++;
+            }
+        }
+
         protected override object Invoke(MethodInfo targetMethod, object[] args)
         {
+            LastMethod = targetMethod;
+
             var name = targetMethod.Name;
+
+            if (IsEvent(targetMethod))
+            {
+                var eventCallInfo = _callInfoList.FirstOrDefault(ci => ci.Name == name);
+
+                if (eventCallInfo == null)
+                {
+                    _callInfoList.Add(new CallInfo
+                    {
+                        Name = name,
+                        Parameters = new[] {new Parameter {Value = args[0], Type = ParameterType.AsDefined}},
+                        Visited = 1,
+                        IsEvent = true
+                    });
+                }
+
+                return null;
+            }
 
             var callInfoListForName = _callInfoList.Where(ci => ci.Name == name).ToList();
 
@@ -162,7 +203,14 @@ namespace HyperMock.Universal
         {
             return method.DeclaringType.GetProperties().Any(p => p.SetMethod != null && p.SetMethod.Equals(method));
         }
-        
+
+        private static bool IsEvent(MethodBase method)
+        {
+            return 
+                method.DeclaringType.GetEvents().Any(e => e.AddMethod != null && e.AddMethod.Equals(method)) ||
+                method.DeclaringType.GetEvents().Any(e => e.RemoveMethod != null && e.RemoveMethod.Equals(method));
+        }
+
         private static ParameterType FindParameterType(LambdaExpression lambda)
         {
             var methodCall = lambda.Body as MethodCallExpression;
@@ -191,7 +239,7 @@ namespace HyperMock.Universal
             arguments = new ReadOnlyCollection<Expression>(new List<Expression>());
             return false;
         }
-
+        
         internal bool TryGetReadPropertyNameAndArgs(Expression expression, out string name)
         {
             var lambda = (LambdaExpression)expression;

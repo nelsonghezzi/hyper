@@ -79,6 +79,16 @@ namespace HyperMock.Universal
             return new VoidBehaviour(callInfo);
         }
 
+        public static void Raise<TMock, TArgs>(this TMock instance, Action<TMock> expression, TArgs args)
+            where TArgs : EventArgs
+        {
+            // Invoke it with the null handler to set the last method called to extract the event handler name
+            expression(instance);
+
+            var dispatcher = GetDispatcher(instance);
+            dispatcher.RaiseEvent(instance, dispatcher.LastMethod, args);
+        }
+
         private static MockProxyDispatcher GetDispatcher<TMock>(TMock instance)
         {
             var dispatcher = instance as MockProxyDispatcher;

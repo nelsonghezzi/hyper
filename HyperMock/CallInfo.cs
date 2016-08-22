@@ -15,6 +15,7 @@ namespace HyperMock.Universal
         internal object ReturnValue { get; set; }
         internal Type ExceptionType { get; set; }
         internal int Visited { get; set; }
+        internal bool IsEvent { get; set; }
 
         internal bool IsMatchFor(params object[] args)
         {

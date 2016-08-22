@@ -140,6 +140,44 @@ namespace HyperMock.Universal.Verification
             }
         }
 
+        ///// <summary>
+        ///// Verifies a method matching the expression occurred the correct number of times.
+        ///// </summary>
+        ///// <typeparam name="TMock">Mocked type</typeparam>
+        ///// <param name="instance">Mocked instance</param>
+        ///// <param name="expression">Expression</param>
+        //public static void VerifyAttached<TMock>(
+        //    this TMock instance, Expression<Action<TMock>> expression)
+        //{
+        //    var dispatcher = GetDispatcher(instance);
+
+        //    string name;
+        //    ReadOnlyCollection<Expression> arguments;
+
+        //    if (dispatcher.TryGetMethodNameAndArgs(expression, out name, out arguments))
+        //    {
+        //        var values = new List<object>();
+
+        //        foreach (var argument in arguments)
+        //        {
+        //            var lambda = Expression.Lambda(argument, expression.Parameters);
+        //            var compiledDelegate = lambda.Compile();
+        //            var value = compiledDelegate.DynamicInvoke(new object[1]);
+        //            values.Add(value);
+        //        }
+
+        //        var callInfo = dispatcher.FindByParameterMatch(name, values.ToArray());
+
+        //        if (callInfo == null && occurred.Count > 0)
+        //            throw new VerificationException(
+        //                $"Unable to verify that the action occurred '{occurred.Count} " +
+        //                $"time{(occurred.Count == 1 ? "s" : "")}.");
+
+        //        if (callInfo != null)
+        //            occurred.Assert(callInfo.Visited);
+        //    }
+        //}
+
         private static MockProxyDispatcher GetDispatcher<TMock>(TMock instance)
         {
             var dispatcher = instance as MockProxyDispatcher;
