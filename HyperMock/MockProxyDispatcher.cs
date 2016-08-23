@@ -187,11 +187,11 @@ namespace HyperMock.Universal
                 throw new MockException(CreateMissingMockMethodMessage(targetMethod, args));
             }
 
-            if (matchedCallInfo.ExceptionType != null)
+            if (matchedCallInfo.Exception != null)
             {
-                var exception = (Exception)Activator.CreateInstance(matchedCallInfo.ExceptionType);
                 matchedCallInfo.Visited++;
-                throw exception;
+
+                throw matchedCallInfo.Exception;
             }
 
             matchedCallInfo.Visited++;

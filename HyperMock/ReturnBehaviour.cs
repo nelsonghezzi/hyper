@@ -1,5 +1,7 @@
 ﻿namespace HyperMock.Universal
 {
+    using System;
+
     /// <summary>
     /// Provides return type behaviours to be added.
     /// </summary>
@@ -28,8 +30,23 @@
         /// </summary>
         /// <typeparam name="TException">Exception type</typeparam>
         public void Throws<TException>()
+            where TException : Exception, new()
         {
-            _callInfo.ExceptionType = typeof(TException);
+            this.Throws(new TException());
+        }
+
+        /// <summary>
+        /// The mocked type method or parameter throws an exception.
+        /// </summary>
+        /// <param name="exception">Exception instance to throw</param>
+        public void Throws(Exception exception)
+        {
+            if (exception == null)
+            {
+                throw new ArgumentNullException(nameof(exception));
+            }
+
+            _callInfo.Exception = exception;
         }
     }
 }
