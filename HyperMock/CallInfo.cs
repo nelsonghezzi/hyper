@@ -13,7 +13,7 @@ namespace HyperMock.Universal
         internal string Name { get; set; }
         internal Parameter[] Parameters { get; set; }
         internal object ReturnValue { get; set; }
-        internal Type ExceptionType { get; set; }
+        internal Exception Exception { get; set; }
         internal int Visited { get; set; }
         internal bool IsEvent { get; set; }
 
