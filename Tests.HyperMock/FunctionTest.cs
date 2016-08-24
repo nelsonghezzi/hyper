@@ -77,10 +77,21 @@ namespace Tests.HyperMock.Universal
         }
 
         [TestMethod]
-        public void MatchThrowsException()
+        public void MatchThrowsExceptionOfType()
         {
             var proxy = Mock.Create<IUserService>();
             proxy.Setup(p => p.Save("Bart")).Throws<InvalidOperationException>();
+
+            var controller = new UserController(proxy);
+
+            Assert.ThrowsException<InvalidOperationException>(() => controller.Save("Bart"));
+        }
+
+        [TestMethod]
+        public void MatchThrowsExceptionInstance()
+        {
+            var proxy = Mock.Create<IUserService>();
+            proxy.Setup(p => p.Save("Bart")).Throws(new InvalidOperationException());
 
             var controller = new UserController(proxy);
 

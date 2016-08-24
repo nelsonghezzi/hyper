@@ -32,7 +32,7 @@
         public void Throws<TException>()
             where TException : Exception, new()
         {
-            this.Throws(new TException());
+            Throws(new TException());
         }
 
         /// <summary>
